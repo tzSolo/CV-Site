@@ -87,6 +87,30 @@ namespace Service
 
             return pullRequests.Count;
         }
-    }
 
+
+        public async Task<IEnumerable<Repository>> SearchForAllRelevant(string? repositoryName, string? language, string? ownerName)
+        {
+            var searchQuery = "";
+            if (!string.IsNullOrEmpty(repositoryName))
+            {
+                searchQuery += $"{repositoryName} in:name";
+            }
+            if (!string.IsNullOrEmpty(ownerName))
+            {
+                searchQuery += $"user:{ownerName} ";
+            }
+            if (!string.IsNullOrEmpty(language))
+            {
+                searchQuery += $"language:{language}";
+            }
+
+            var allRelevantRepositories = await _client.Search.SearchRepo(new SearchRepositoriesRequest(searchQuery)
+            {
+                SortField = RepoSearchSort.Stars
+            });
+
+            return allRelevantRepositories.Items;
+        }
+    }
 }
