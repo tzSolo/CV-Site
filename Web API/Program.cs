@@ -1,4 +1,5 @@
 using Service;
+using Web_API;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +11,10 @@ builder.Services.AddSwaggerGen();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddScoped<IGitHubService, GitHubService>();
 
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<IGitHubService, GitHubService>();
+builder.Services.Decorate<IGitHubService, CachedGitHubService>();
 
 var app = builder.Build();
 

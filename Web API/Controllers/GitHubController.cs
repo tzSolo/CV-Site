@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Octokit;
 using Service;
 
@@ -9,9 +8,9 @@ namespace Web_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GitHubController(GitHubService gitHubService, IConfiguration configuration) : ControllerBase
+    public class GitHubController(IGitHubService gitHubService, IConfiguration configuration) : ControllerBase
     {
-        private readonly GitHubService _gitHubService = gitHubService;
+        private readonly IGitHubService _gitHubService = gitHubService;
         private readonly IConfiguration _configuration = configuration;
 
         // GET: api/<GitHubController>
