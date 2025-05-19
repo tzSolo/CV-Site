@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Service
 {
-    public class GitHubService(IConfiguration configuration)
+    public class GitHubService(IConfiguration configuration): IGitHubService
     {
         private readonly GitHubClient _client = new(new ProductHeaderValue("cv-site"))
         {

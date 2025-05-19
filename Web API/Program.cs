@@ -10,7 +10,7 @@ builder.Services.AddSwaggerGen();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddScoped<GitHubService>();
+builder.Services.AddScoped<IGitHubService, GitHubService>();
 
 
 var app = builder.Build();
