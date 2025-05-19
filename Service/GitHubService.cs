@@ -1,4 +1,5 @@
-﻿using Octokit;
+﻿using Microsoft.Extensions.Configuration;
+using Octokit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,13 +8,84 @@ using System.Threading.Tasks;
 
 namespace Service
 {
-    public class GitHubService
+    public class GitHubService(IConfiguration configuration)
     {
-        private readonly GitHubClient _client = new GitHubClient(new ProductHeaderValue("cv-site"));
+        private readonly GitHubClient _client = new(new ProductHeaderValue("cv-site")) { Credentials = new Credentials(configuration["PersonalAccessToken"]) };
 
-        public void ContactUser(string UserName,string Token)
+        public async Task<PortfolioDetails> GetUserRepositories(string ownerName)
         {
-            var getUserDetails = _client.User.Get(UserName);
+            var allUserRepositories = await _client.Repository.GetAllForUser(ownerName);
+
+            var repositoriesDetails = new List<RepositoryDetails>();
+
+            foreach (var repository in allUserRepositories)
+            {
+                if (repository != null)
+                {
+                    var repositoryDetails = await GetRepositoryDetails(repository);
+
+                    repositoriesDetails.Add(repositoryDetails);
+                }
+            }
+
+            var ownerPortfolioDetails = new PortfolioDetails()
+            {
+                AllRepositoriesDetails = repositoriesDetails
+            };
+
+            return ownerPortfolioDetails;
+        }
+
+
+        public async Task<RepositoryDetails> GetRepositoryDetails(Repository repository)
+        {
+            var repositoryDetails = new RepositoryDetails()
+            {
+                LastCommit = await GetRepositoryLastCommit(repository),
+                LanguagesDetails = await GetRepositoryLanguages(repository),
+                StargazersCount = repository.StargazersCount,
+                PullRequestsCount = await GetPullRequestCount(repository),
+                LinkToRepository = repository.HtmlUrl
+            };
+
+            return repositoryDetails;
+        }
+
+
+        public async Task<LanguagesDetails> GetRepositoryLanguages(Repository repository)
+        {
+            var portfolioDetails = new LanguagesDetails
+            {
+                Repository = repository
+            };
+
+            var allRepositoryLanguages = await _client.Repository.GetAllLanguages(repository.Owner.Login, repository.Name);
+
+            portfolioDetails.Languages = allRepositoryLanguages;
+
+            return portfolioDetails;
+        }
+
+
+        public async Task<Commit> GetRepositoryLastCommit(Repository repository)
+        {
+            var allRepositoriesCommits = await _client.Repository.Commit.GetAll(repository.Owner.Login, repository.Name);
+
+            if (allRepositoriesCommits.Count > 0)
+            {
+                return allRepositoriesCommits[0].Commit;
+            }
+
+            return new Commit();
+        }
+
+
+        public async Task<int> GetPullRequestCount(Repository repository)
+        {
+            var pullRequests = await _client.PullRequest.GetAllForRepository(repository.Owner.Login, repository.Name);
+
+            return pullRequests.Count;
         }
     }
+
 }

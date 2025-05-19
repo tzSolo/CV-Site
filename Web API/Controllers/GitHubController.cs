@@ -12,11 +12,14 @@ namespace Web_API.Controllers
     {
         private readonly GitHubService _gitHubService = gitHubService;
         private readonly IConfiguration _configuration = configuration;
+
         // GET: api/<GitHubController>
-        [HttpGet("GetAllRepositories")]
-        public IEnumerable<string> GetPortfolioAsync()
+        [HttpGet("AllRepos")]
+        public async Task<PortfolioDetails> GetPortfolioAsync()
         {
-            return new string[] { "value1", "value2" };
+            var allUserRepositories = await _gitHubService.GetUserRepositories(_configuration["MyUserName"]);
+            
+            return allUserRepositories;
         }
 
         // GET: api/<GitHubController>
