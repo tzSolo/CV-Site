@@ -9,6 +9,7 @@ namespace Service
 {
     public class RepositoryDetails
     {
+        public string Name { get; set; }
         public LanguagesDetails LanguagesDetails { get; set; }
         public Commit LastCommit { get; set; }
         public int StargazersCount { get; set; }

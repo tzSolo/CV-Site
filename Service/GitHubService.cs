@@ -10,7 +10,10 @@ namespace Service
 {
     public class GitHubService(IConfiguration configuration)
     {
-        private readonly GitHubClient _client = new(new ProductHeaderValue("cv-site")) { Credentials = new Credentials(configuration["PersonalAccessToken"]) };
+        private readonly GitHubClient _client = new(new ProductHeaderValue("cv-site"))
+        {
+            Credentials = new Credentials(configuration["PersonalAccessToken"])
+        };
 
         public async Task<PortfolioDetails> GetUserRepositories(string ownerName)
         {
@@ -41,6 +44,7 @@ namespace Service
         {
             var repositoryDetails = new RepositoryDetails()
             {
+                Name = repository.Name,
                 LastCommit = await GetRepositoryLastCommit(repository),
                 LanguagesDetails = await GetRepositoryLanguages(repository),
                 StargazersCount = repository.StargazersCount,
@@ -54,10 +58,7 @@ namespace Service
 
         public async Task<LanguagesDetails> GetRepositoryLanguages(Repository repository)
         {
-            var portfolioDetails = new LanguagesDetails
-            {
-                Repository = repository
-            };
+            var portfolioDetails = new LanguagesDetails();
 
             var allRepositoryLanguages = await _client.Repository.GetAllLanguages(repository.Owner.Login, repository.Name);
 

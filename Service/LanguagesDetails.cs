@@ -9,7 +9,6 @@ namespace Service
 {
     public class LanguagesDetails
     {
-        public Repository Repository { get; set; }
         public IEnumerable<RepositoryLanguage> Languages { get; set; }
     }
 }
