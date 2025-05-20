@@ -9,7 +9,7 @@ namespace Service
 {
     public interface IGitHubService
     {
-        Task<PortfolioDetails> GetUserRepositories(string ownerName);
+        Task<PortfolioDetails> GetUserRepositories(string ownerName,string token);
         Task<RepositoryDetails> GetRepositoryDetails(Repository repository);
         Task<LanguagesDetails> GetRepositoryLanguages(Repository repository);
         Task<Commit> GetRepositoryLastCommit(Repository repository);

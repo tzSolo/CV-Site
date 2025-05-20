@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Octokit;
 using System;
 using System.Collections.Generic;
@@ -8,14 +9,15 @@ using System.Threading.Tasks;
 
 namespace Service
 {
-    public class GitHubService(IConfiguration configuration): IGitHubService
+    public class GitHubService(IOptions<GitHubIntegrationOptions> options) : IGitHubService
     {
         private readonly GitHubClient _client = new(new ProductHeaderValue("cv-site"))
         {
-            Credentials = new Credentials(configuration["PersonalAccessToken"])
+            Credentials = new Credentials(options.Value.PersonalAccessToken)
         };
 
-        public async Task<PortfolioDetails> GetUserRepositories(string ownerName)
+
+        public async Task<PortfolioDetails> GetUserRepositories(string ownerName, string token)
         {
             var allUserRepositories = await _client.Repository.GetAllForUser(ownerName);
 
@@ -49,7 +51,7 @@ namespace Service
                 LanguagesDetails = await GetRepositoryLanguages(repository),
                 StargazersCount = repository.StargazersCount,
                 PullRequestsCount = await GetPullRequestCount(repository),
-                LinkToRepository = repository.HtmlUrl
+                DeploymentUrl = await GetRepositoryLinkToDeployment(repository)
             };
 
             return repositoryDetails;
@@ -88,6 +90,19 @@ namespace Service
             return pullRequests.Count;
         }
 
+
+        public async Task<string> GetRepositoryLinkToDeployment(Repository repository)
+        {
+            var deploymentDetails = await _client.Repository.Deployment.GetAll(repository.Owner.Login, repository.Name);
+            
+            if (deploymentDetails.Count > 0)
+            {
+                var deploymentUrl = deploymentDetails[0].Url;
+                return deploymentUrl;
+            }
+
+            return "There is no deployment url.";
+        }
 
         public async Task<IEnumerable<Repository>> SearchForAllRelevant(string? repositoryName, string? language, string? ownerName)
         {

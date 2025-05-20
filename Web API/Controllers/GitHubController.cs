@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Octokit;
 using Service;
 
@@ -8,16 +9,16 @@ namespace Web_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GitHubController(IGitHubService gitHubService, IConfiguration configuration) : ControllerBase
+    public class GitHubController(IGitHubService gitHubService, IOptions<GitHubIntegrationOptions> options) : ControllerBase
     {
         private readonly IGitHubService _gitHubService = gitHubService;
-        private readonly IConfiguration _configuration = configuration;
+        private readonly GitHubIntegrationOptions _options = options.Value;
 
         // GET: api/<GitHubController>
         [HttpGet("AllRepos")]
         public async Task<PortfolioDetails> GetPortfolioAsync()
         {
-            var allUserRepositories = await _gitHubService.GetUserRepositories(_configuration["MyUserName"]);
+            var allUserRepositories = await _gitHubService.GetUserRepositories(_options.MyUserName,_options.PersonalAccessToken);
 
             return allUserRepositories;
         }
@@ -27,7 +28,7 @@ namespace Web_API.Controllers
         public async Task<IEnumerable<Repository>> SearchRepositories(string? repositoryName, string? language, string? ownerName)
         {
             var relevantRepositories = await _gitHubService.SearchForAllRelevant(repositoryName, language, ownerName);
-           
+
             return relevantRepositories;
         }
     }

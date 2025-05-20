@@ -14,6 +14,6 @@ namespace Service
         public Commit LastCommit { get; set; }
         public int StargazersCount { get; set; }
         public int PullRequestsCount { get; set; }
-        public string LinkToRepository { get; set; }
+        public string DeploymentUrl { get; set; }
     }
 }

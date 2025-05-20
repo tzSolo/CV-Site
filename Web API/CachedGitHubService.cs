@@ -15,7 +15,7 @@ namespace Web_API
         private readonly IMemoryCache _memoryCache = memoryCache;
         private const string UserPortfolio = "UserPortfolio";
 
-        public async Task<PortfolioDetails> GetUserRepositories(string ownerName)
+        public async Task<PortfolioDetails> GetUserRepositories(string ownerName, string token)
         {
             if (_memoryCache.TryGetValue("UserPortfolio", out PortfolioDetails portfolio))
             {
@@ -26,7 +26,7 @@ namespace Web_API
                 .SetAbsoluteExpiration(TimeSpan.FromSeconds(45))
                 .SetSlidingExpiration(TimeSpan.FromSeconds(20));
 
-            portfolio = await _gitHubService.GetUserRepositories(ownerName);
+            portfolio = await _gitHubService.GetUserRepositories(ownerName, token);
 
             _memoryCache.Set(UserPortfolio, portfolio, cacheOptions);
 
