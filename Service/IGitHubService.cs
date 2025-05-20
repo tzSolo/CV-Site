@@ -14,6 +14,7 @@ namespace Service
         Task<LanguagesDetails> GetRepositoryLanguages(Repository repository);
         Task<Commit> GetRepositoryLastCommit(Repository repository);
         Task<int> GetPullRequestCount(Repository repository);
+        Task<string> GetRepositoryLinkToDeployment(Repository repository);
         Task<IEnumerable<Repository>> SearchForAllRelevant(string? repositoryName, string? language, string? ownerName);
     }
 }

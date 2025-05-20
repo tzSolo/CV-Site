@@ -94,7 +94,7 @@ namespace Service
         public async Task<string> GetRepositoryLinkToDeployment(Repository repository)
         {
             var deploymentDetails = await _client.Repository.Deployment.GetAll(repository.Owner.Login, repository.Name);
-            
+
             if (deploymentDetails.Count > 0)
             {
                 var deploymentUrl = deploymentDetails[0].Url;
@@ -104,28 +104,36 @@ namespace Service
             return "There is no deployment url.";
         }
 
+
         public async Task<IEnumerable<Repository>> SearchForAllRelevant(string? repositoryName, string? language, string? ownerName)
         {
             var searchQuery = "";
+
             if (!string.IsNullOrEmpty(repositoryName))
             {
                 searchQuery += $"{repositoryName} in:name";
             }
+
             if (!string.IsNullOrEmpty(ownerName))
             {
                 searchQuery += $"user:{ownerName} ";
             }
+
             if (!string.IsNullOrEmpty(language))
             {
                 searchQuery += $"language:{language}";
             }
 
-            var allRelevantRepositories = await _client.Search.SearchRepo(new SearchRepositoriesRequest(searchQuery)
+            if (searchQuery != "")
             {
-                SortField = RepoSearchSort.Stars
-            });
+                var allRelevantRepositories = await _client.Search.SearchRepo(new SearchRepositoriesRequest(searchQuery)
+                {
+                    SortField = RepoSearchSort.Stars
+                });
+                return allRelevantRepositories.Items;
+            }
 
-            return allRelevantRepositories.Items;
+            return [];
         }
     }
 }

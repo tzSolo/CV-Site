@@ -53,6 +53,11 @@ namespace Web_API
             return _gitHubService.GetPullRequestCount(repository);
         }
 
+        public Task<string> GetRepositoryLinkToDeployment(Repository repository)
+        {
+            return _gitHubService.GetRepositoryLinkToDeployment(repository);
+        }
+
         public Task<IEnumerable<Repository>> SearchForAllRelevant(string? repositoryName, string? language, string? ownerName)
         {
             return _gitHubService.SearchForAllRelevant(repositoryName, language, ownerName);
